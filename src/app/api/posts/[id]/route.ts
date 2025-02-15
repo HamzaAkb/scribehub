@@ -41,3 +41,35 @@ export async function PATCH(
 
     return NextResponse.json(updatedPost, { status: 200 })
 }
+
+export async function DELETE(
+    request: Request,
+    { params }: { params: { id: string } }
+) {
+    const session = await getServerSession(authOptions)
+    if (!session || !session.user || !session.user.email) {
+        return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+    }
+
+    const { id } = params
+
+    // Fetch the post to verify ownership
+    const post = await prisma.post.findUnique({
+        where: { id: Number(id) },
+        include: { author: true }
+    })
+
+    if (!post) {
+        return NextResponse.json({ error: "Post not found" }, { status: 404 })
+    }
+
+    if (post.author.email !== session.user.email) {
+        return NextResponse.json({ error: "Unauthorized" }, { status: 403 })
+    }
+
+    await prisma.post.delete({
+        where: { id: Number(id) }
+    })
+
+    return NextResponse.json({ message: "Post deleted successfully" }, { status: 200 })
+}

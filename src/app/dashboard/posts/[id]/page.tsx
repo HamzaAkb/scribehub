@@ -2,6 +2,7 @@ import prisma from '@/lib/prisma'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/app/api/auth/[...nextauth]/route'
 import { redirect } from 'next/navigation'
+import DeletePostButton from '@/components/DeletePostButton'
 
 interface PostPageProps {
   params: { id: string }
@@ -36,9 +37,7 @@ export default async function PostPage({ params }: PostPageProps) {
           <button className='px-4 py-2 bg-blue-500 text-white rounded mr-2'>
             Edit
           </button>
-          <button className='px-4 py-2 bg-red-500 text-white rounded'>
-            Delete
-          </button>
+          <DeletePostButton postId={post.id} />
         </div>
       )}
     </div>
