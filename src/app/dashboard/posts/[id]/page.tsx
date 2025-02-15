@@ -2,6 +2,7 @@ import prisma from '@/lib/prisma'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/app/api/auth/[...nextauth]/route'
 import { redirect } from 'next/navigation'
+import CommentsSection from '@/components/CommentsSection.tsxCommentsSection'
 import DeletePostButton from '@/components/DeletePostButton'
 
 interface PostPageProps {
@@ -16,21 +17,32 @@ export default async function PostPage({ params }: PostPageProps) {
 
   const post = await prisma.post.findUnique({
     where: { id: Number(params.id) },
-    include: { author: true },
+    include: {
+      author: true,
+      comments: { include: { author: true } },
+    },
   })
 
   if (!post) {
     return <div>Post not found</div>
   }
 
-  const isAuthor = post.author.email === session.user.email
+  const postWithComments = post as typeof post & {
+    comments: Array<{
+      id: number
+      content: string
+      author: { name: string | null; email: string }
+    }>
+  }
+
+  const isAuthor = postWithComments.author.email === session.user.email
 
   return (
     <div className='p-8'>
-      <h1 className='text-2xl mb-4'>{post.title}</h1>
-      <p className='mb-2'>{post.content}</p>
+      <h1 className='text-2xl mb-4'>{postWithComments.title}</h1>
+      <p className='mb-2'>{postWithComments.content}</p>
       <p className='text-sm text-gray-500'>
-        {new Date(post.createdAt).toLocaleString()}
+        {new Date(postWithComments.createdAt).toLocaleString()}
       </p>
       {isAuthor && (
         <div className='mt-4'>
@@ -40,6 +52,11 @@ export default async function PostPage({ params }: PostPageProps) {
           <DeletePostButton postId={post.id} />
         </div>
       )}
+      <hr className='my-6' />
+      <CommentsSection
+        initialComments={postWithComments.comments}
+        postId={postWithComments.id}
+      />
     </div>
   )
 }
