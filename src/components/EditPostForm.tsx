@@ -4,12 +4,13 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 
 interface EditPostFormProps {
-  post: { id: number; title: string; content: string }
+  post: { id: number; title: string; content: string; published: boolean }
 }
 
 export default function EditPostForm({ post }: EditPostFormProps) {
   const [title, setTitle] = useState(post.title)
   const [content, setContent] = useState(post.content)
+  const [published, setPublished] = useState(post.published)
   const [loading, setLoading] = useState(false)
   const router = useRouter()
 
@@ -20,7 +21,7 @@ export default function EditPostForm({ post }: EditPostFormProps) {
     const res = await fetch(`/api/posts/${post.id}`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ title, content }),
+      body: JSON.stringify({ title, content, published }),
     })
 
     if (res.ok) {
@@ -55,6 +56,17 @@ export default function EditPostForm({ post }: EditPostFormProps) {
             rows={5}
             required
           />
+        </div>
+        <div className='mb-4'>
+          <label className='inline-flex items-center'>
+            <input
+              type='checkbox'
+              checked={published}
+              onChange={(e) => setPublished(e.target.checked)}
+              className='mr-2'
+            />
+            Published
+          </label>
         </div>
         <button
           type='submit'

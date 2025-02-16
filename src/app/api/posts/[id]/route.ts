@@ -14,13 +14,13 @@ export async function PATCH(
 
     const { id } = params
     const body = await request.json()
-    const { title, content } = body
+    const { title, content, published } = body
 
     if (!title || !content) {
         return NextResponse.json({ error: "Missing title or content" }, { status: 400 })
     }
 
-    // Fetch the post to verify the author
+    // Fetch the post to verify ownership
     const post = await prisma.post.findUnique({
         where: { id: Number(id) },
         include: { author: true }
@@ -36,7 +36,7 @@ export async function PATCH(
 
     const updatedPost = await prisma.post.update({
         where: { id: Number(id) },
-        data: { title, content }
+        data: { title, content, published: published === undefined ? post.published : published }
     })
 
     return NextResponse.json(updatedPost, { status: 200 })
