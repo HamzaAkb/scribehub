@@ -1,9 +1,21 @@
 import prisma from '@/lib/prisma'
 import Link from 'next/link'
 
-export default async function Home() {
+interface HomePageProps {
+  searchParams: { query?: string }
+}
+
+export default async function HomePage({ searchParams }: HomePageProps) {
+  const query = searchParams.query || ''
+
   const posts = await prisma.post.findMany({
-    where: { published: true },
+    where: {
+      published: true,
+      title: {
+        contains: query,
+        mode: 'insensitive',
+      },
+    },
     include: { author: true },
     orderBy: { createdAt: 'desc' },
   })
@@ -11,6 +23,21 @@ export default async function Home() {
   return (
     <div className='p-8'>
       <h1 className='text-3xl mb-8'>Public Blog Posts</h1>
+      <form method='GET' className='mb-8'>
+        <input
+          type='text'
+          name='query'
+          placeholder='Search posts...'
+          defaultValue={query}
+          className='p-2 border rounded'
+        />
+        <button
+          type='submit'
+          className='ml-2 px-4 py-2 bg-blue-500 text-white rounded'
+        >
+          Search
+        </button>
+      </form>
       {posts.length === 0 ? (
         <p>No posts available.</p>
       ) : (
