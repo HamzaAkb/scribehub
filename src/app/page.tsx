@@ -2,23 +2,35 @@ import prisma from '@/lib/prisma'
 import Link from 'next/link'
 
 interface HomePageProps {
-  searchParams: { query?: string }
+  searchParams: { query?: string; page?: string }
 }
 
 export default async function HomePage({ searchParams }: HomePageProps) {
-  const query = searchParams.query || ''
+  const resolvedSearchParams = await Promise.resolve(searchParams)
+  const query = resolvedSearchParams.query || ''
+  const currentPage = parseInt(resolvedSearchParams.page || '1', 10)
+  const postsPerPage = 5
+  const skip = (currentPage - 1) * postsPerPage
+
+  const totalPosts = await prisma.post.count({
+    where: {
+      published: true,
+      title: { contains: query, mode: 'insensitive' },
+    },
+  })
 
   const posts = await prisma.post.findMany({
     where: {
       published: true,
-      title: {
-        contains: query,
-        mode: 'insensitive',
-      },
+      title: { contains: query, mode: 'insensitive' },
     },
     include: { author: true },
     orderBy: { createdAt: 'desc' },
+    skip,
+    take: postsPerPage,
   })
+
+  const totalPages = Math.ceil(totalPosts / postsPerPage)
 
   return (
     <div className='p-8'>
@@ -56,6 +68,24 @@ export default async function HomePage({ searchParams }: HomePageProps) {
           </div>
         ))
       )}
+      <div className='mt-8 flex justify-center space-x-4'>
+        {currentPage > 1 && (
+          <Link
+            href={`/?query=${query}&page=${currentPage - 1}`}
+            className='px-4 py-2 bg-gray-300 rounded'
+          >
+            Previous
+          </Link>
+        )}
+        {currentPage < totalPages && (
+          <Link
+            href={`/?query=${query}&page=${currentPage + 1}`}
+            className='px-4 py-2 bg-gray-300 rounded'
+          >
+            Next
+          </Link>
+        )}
+      </div>
     </div>
   )
 }
