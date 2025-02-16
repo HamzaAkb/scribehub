@@ -1,5 +1,6 @@
 import prisma from '@/lib/prisma'
 import { notFound } from 'next/navigation'
+import LikeButton from '@/components/LikeButton'
 
 interface PostPageProps {
   params: { id: string }
@@ -28,6 +29,7 @@ export default async function PostPage({ params }: PostPageProps) {
       <div className='mt-4'>
         <p>{post.content}</p>
       </div>
+      <LikeButton postId={post.id} initialLikes={post.likes} />
     </div>
   )
 }

@@ -31,6 +31,7 @@ model Post {
   title     String
   content   String
   published Boolean  @default(false)
+  likes     Int      @default(0)
   author    User     @relation(fields: [authorId], references: [id])
   authorId  Int
   comments  Comment[]
