@@ -1,6 +1,6 @@
 import prisma from '@/lib/prisma'
 import { notFound } from 'next/navigation'
-import LikeButton from '@/components/LikeButton'
+import ShareButtons from '@/components/ShareButtons'
 
 interface PostPageProps {
   params: { id: string }
@@ -19,6 +19,9 @@ export default async function PostPage({ params }: PostPageProps) {
     return notFound()
   }
 
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
+  const postUrl = `${siteUrl}/posts/${post.id}`
+
   return (
     <div className='p-8'>
       <h1 className='text-3xl font-bold mb-2'>{post.title}</h1>
@@ -29,7 +32,7 @@ export default async function PostPage({ params }: PostPageProps) {
       <div className='mt-4'>
         <p>{post.content}</p>
       </div>
-      <LikeButton postId={post.id} initialLikes={post.likes} />
+      <ShareButtons url={postUrl} title={post.title} />
     </div>
   )
 }
