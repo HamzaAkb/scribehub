@@ -1,6 +1,9 @@
 import prisma from '@/lib/prisma'
 import { notFound } from 'next/navigation'
 import ShareButtons from '@/components/ShareButtons'
+import CommentsSection from '@/components/CommentsSection'
+import { getServerSession } from 'next-auth'
+import { authOptions } from '@/app/api/auth/[...nextauth]/route'
 
 interface PostPageProps {
   params: { id: string }
@@ -10,9 +13,11 @@ export default async function PostPage({ params }: PostPageProps) {
   const resolvedParams = await Promise.resolve(params)
   const { id } = resolvedParams
 
+  const session = await getServerSession(authOptions)
+
   const post = await prisma.post.findUnique({
     where: { id: Number(id) },
-    include: { author: true },
+    include: { author: true, comments: { include: { author: true } } },
   })
 
   if (!post || !post.published) {
@@ -33,6 +38,11 @@ export default async function PostPage({ params }: PostPageProps) {
         <p>{post.content}</p>
       </div>
       <ShareButtons url={postUrl} title={post.title} />
+      <CommentsSection
+        initialComments={post.comments}
+        postId={post.id}
+        currentUserEmail={session?.user?.email || ''}
+      />
     </div>
   )
 }

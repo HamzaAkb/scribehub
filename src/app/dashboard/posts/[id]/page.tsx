@@ -2,15 +2,14 @@ import prisma from '@/lib/prisma'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/app/api/auth/[...nextauth]/route'
 import { redirect } from 'next/navigation'
-import CommentsSection from '@/components/CommentsSection.tsxCommentsSection'
 import DeletePostButton from '@/components/DeletePostButton'
+import CommentsSection from '@/components/CommentsSection'
 
 interface PostPageProps {
   params: { id: string }
 }
 
 export default async function PostPage({ params }: PostPageProps) {
-  // Await the params before using them
   const resolvedParams = await Promise.resolve(params)
   const { id } = resolvedParams
 
@@ -49,7 +48,11 @@ export default async function PostPage({ params }: PostPageProps) {
         </div>
       )}
       <hr className='my-6' />
-      <CommentsSection initialComments={post.comments} postId={post.id} />
+      <CommentsSection
+        initialComments={post.comments}
+        postId={post.id}
+        currentUserEmail={session.user.email}
+      />
     </div>
   )
 }
