@@ -31,7 +31,10 @@ export default function NewPostForm() {
     if (imageFile) {
       const formData = new FormData()
       formData.append('file', imageFile)
-      formData.append('upload_preset', 'scribehub')
+      formData.append(
+        'upload_preset',
+        process.env.NEXT_PUBLIC_COUDINARY_PRESET as string
+      )
 
       const res = await fetch(
         `https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/upload`,

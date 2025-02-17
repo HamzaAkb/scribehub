@@ -20,7 +20,10 @@ export default async function EditProfilePage() {
 
   return (
     <div className='p-8'>
-      <EditProfileForm currentName={user.name} />
+      <EditProfileForm
+        currentName={user.name}
+        currentImageUrl={user.imageUrl}
+      />
     </div>
   )
 }

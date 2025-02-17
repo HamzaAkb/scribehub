@@ -10,15 +10,23 @@ export async function PATCH(request: Request) {
     }
 
     const body = await request.json()
-    const { name } = body
+    const { name, imageUrl } = body
 
-    if (!name) {
-        return NextResponse.json({ error: "Name is required" }, { status: 400 })
+    if (!name && !imageUrl) {
+        return NextResponse.json({ error: "No data provided" }, { status: 400 })
+    }
+
+    const data: { name?: string; imageUrl?: string } = {}
+    if (name) {
+        data.name = name
+    }
+    if (imageUrl) {
+        data.imageUrl = imageUrl
     }
 
     const updatedUser = await prisma.user.update({
         where: { email: session.user.email },
-        data: { name }
+        data,
     })
 
     return NextResponse.json(updatedUser, { status: 200 })

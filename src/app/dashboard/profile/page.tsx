@@ -20,7 +20,16 @@ export default async function ProfilePage() {
 
   return (
     <div className='p-8'>
-      <h1 className='text-3xl mb-4'>{user.name || user.email}'s Profile</h1>
+      <div className='flex items-center mb-8'>
+        {user.imageUrl && (
+          <img
+            src={user.imageUrl}
+            alt='Profile Picture'
+            className='h-24 w-24 object-cover rounded-full mr-4'
+          />
+        )}
+        <h1 className='text-3xl'>{user.name || user.email}'s Profile</h1>
+      </div>
       <section className='mb-8'>
         <h2 className='text-2xl mb-2'>Your Posts</h2>
         {user.posts.length === 0 ? (
