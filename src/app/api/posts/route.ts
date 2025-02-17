@@ -10,11 +10,13 @@ export async function POST(request: Request) {
     }
 
     const body = await request.json()
-    const { title, content } = body
+    const { title, content, tags } = body
 
     if (!title || !content) {
         return NextResponse.json({ error: 'Missing title or content' }, { status: 400 })
     }
+
+    const tagNames = tags ? tags.split(",").map((t: string) => t.trim()).filter((t: string) => t !== "") : []
 
     const post = await prisma.post.create({
         data: {
@@ -23,6 +25,12 @@ export async function POST(request: Request) {
             published: false,
             author: {
                 connect: { email: session.user.email }
+            },
+            tags: {
+                connectOrCreate: tagNames.map((tagName: string) => ({
+                    where: { name: tagName },
+                    create: { name: tagName }
+                }))
             }
         }
     })

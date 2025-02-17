@@ -26,6 +26,12 @@ model User {
   createdAt      DateTime  @default(now())
 }
 
+model Tag {
+  id    Int    @id @default(autoincrement())
+  name  String @unique
+  posts Post[] @relation("PostTags")
+}
+
 model Post {
   id        Int      @id @default(autoincrement())
   title     String
@@ -35,6 +41,7 @@ model Post {
   author    User     @relation(fields: [authorId], references: [id])
   authorId  Int
   comments  Comment[]
+  tags      Tag[]    @relation("PostTags")
   createdAt DateTime @default(now())
 }
 

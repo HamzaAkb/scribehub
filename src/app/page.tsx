@@ -24,7 +24,7 @@ export default async function HomePage({ searchParams }: HomePageProps) {
       published: true,
       title: { contains: query, mode: 'insensitive' },
     },
-    include: { author: true },
+    include: { author: true, tags: true },
     orderBy: { createdAt: 'desc' },
     skip,
     take: postsPerPage,
@@ -65,6 +65,18 @@ export default async function HomePage({ searchParams }: HomePageProps) {
               {new Date(post.createdAt).toLocaleDateString()}
             </p>
             <p className='mt-2'>{post.content.substring(0, 100)}...</p>
+            {post.tags && post.tags.length > 0 && (
+              <div className='mt-2'>
+                {post.tags.map((tag: any) => (
+                  <span
+                    key={tag.id}
+                    className='inline-block bg-gray-200 px-2 py-1 text-sm rounded mr-2'
+                  >
+                    {tag.name}
+                  </span>
+                ))}
+              </div>
+            )}
           </div>
         ))
       )}

@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation'
 export default function NewPostForm() {
   const [title, setTitle] = useState('')
   const [content, setContent] = useState('')
+  const [tags, setTags] = useState('')
   const [loading, setLoading] = useState(false)
   const router = useRouter()
 
@@ -16,14 +17,12 @@ export default function NewPostForm() {
     const res = await fetch('/api/posts', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ title, content }),
+      body: JSON.stringify({ title, content, tags }),
     })
 
     if (res.ok) {
-      // Redirect to the posts listing page after successful creation
       router.push('/dashboard/posts')
     } else {
-      // Optionally, handle the error by showing a message
       console.error('Error creating post')
     }
 
@@ -52,6 +51,16 @@ export default function NewPostForm() {
             className='w-full p-2 border rounded'
             rows={5}
             required
+          />
+        </div>
+        <div className='mb-4'>
+          <label className='block mb-1'>Tags (comma-separated)</label>
+          <input
+            type='text'
+            value={tags}
+            onChange={(e) => setTags(e.target.value)}
+            className='w-full p-2 border rounded'
+            placeholder='e.g. JavaScript, Next.js, Prisma'
           />
         </div>
         <button
