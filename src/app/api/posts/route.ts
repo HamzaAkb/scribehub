@@ -10,7 +10,7 @@ export async function POST(request: Request) {
     }
 
     const body = await request.json()
-    const { title, content, tags } = body
+    const { title, content, tags, imageUrl } = body
 
     if (!title || !content) {
         return NextResponse.json({ error: 'Missing title or content' }, { status: 400 })
@@ -23,6 +23,7 @@ export async function POST(request: Request) {
             title,
             content,
             published: false,
+            imageUrl,
             author: {
                 connect: { email: session.user.email }
             },
