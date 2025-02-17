@@ -33,17 +33,18 @@ model Tag {
 }
 
 model Post {
-  id        Int      @id @default(autoincrement())
-  title     String
-  content   String
-  published Boolean  @default(false)
-  likes     Int      @default(0)
-  imageUrl  String?
-  author    User     @relation(fields: [authorId], references: [id])
-  authorId  Int
-  comments  Comment[]
-  tags      Tag[]    @relation("PostTags")
-  createdAt DateTime @default(now())
+  id          Int      @id @default(autoincrement())
+  title       String
+  content     String
+  published   Boolean  @default(false)
+  scheduledAt DateTime?  // New field for scheduling publication
+  likes       Int      @default(0)
+  imageUrl    String?
+  author      User     @relation(fields: [authorId], references: [id])
+  authorId    Int
+  comments    Comment[]
+  tags        Tag[]    @relation("PostTags")
+  createdAt   DateTime @default(now())
 }
 
 model Comment {

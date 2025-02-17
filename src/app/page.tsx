@@ -21,8 +21,15 @@ export default async function HomePage({ searchParams }: HomePageProps) {
 
   const posts = await prisma.post.findMany({
     where: {
-      published: true,
-      title: { contains: query, mode: 'insensitive' },
+      AND: [
+        {
+          OR: [
+            { published: true },
+            { scheduledAt: { lte: new Date() } } as any,
+          ],
+        },
+        { title: { contains: query, mode: 'insensitive' } },
+      ],
     },
     include: { author: true, tags: true },
     orderBy: { createdAt: 'desc' },

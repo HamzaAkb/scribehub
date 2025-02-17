@@ -16,11 +16,17 @@ export default async function PostPage({ params }: PostPageProps) {
   const session = await getServerSession(authOptions)
 
   const post = await prisma.post.findUnique({
-    where: { id: Number(id) },
+    where: {
+      id: Number(id),
+      OR: [{ published: true }, { scheduledAt: { lte: new Date() } } as any],
+    },
     include: { author: true, comments: { include: { author: true } } },
   })
 
-  if (!post || !post.published) {
+  if (
+    !post ||
+    (!post.published && (!post.scheduledAt || post.scheduledAt > new Date()))
+  ) {
     return notFound()
   }
 

@@ -8,6 +8,7 @@ export default function NewPostForm() {
   const [content, setContent] = useState('')
   const [tags, setTags] = useState('')
   const [imageFile, setImageFile] = useState<File | null>(null)
+  const [scheduledAt, setScheduledAt] = useState('')
   const [loading, setLoading] = useState(false)
   const router = useRouter()
 
@@ -17,23 +18,17 @@ export default function NewPostForm() {
     }
   }
 
-  console.log(
-    'process.env.CLOUDINARY_CLOUD_NAME: ',
-    process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME
-  )
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
 
     let imageUrl = ''
-
     if (imageFile) {
       const formData = new FormData()
       formData.append('file', imageFile)
       formData.append(
         'upload_preset',
-        process.env.NEXT_PUBLIC_COUDINARY_PRESET as string
+        process.env.NEXT_PUBLIC_COUDINARY_PRESET || 'defaultPreset'
       )
 
       const res = await fetch(
@@ -55,7 +50,7 @@ export default function NewPostForm() {
     const res = await fetch('/api/posts', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ title, content, tags, imageUrl }),
+      body: JSON.stringify({ title, content, tags, imageUrl, scheduledAt }),
     })
 
     if (res.ok) {
@@ -104,6 +99,20 @@ export default function NewPostForm() {
         <div className='mb-4'>
           <label className='block mb-1'>Featured Image</label>
           <input type='file' onChange={handleFileChange} />
+        </div>
+        <div className='mb-4'>
+          <label className='block mb-1'>
+            Scheduled Publication Date (optional)
+          </label>
+          <input
+            type='datetime-local'
+            value={scheduledAt}
+            onChange={(e) => setScheduledAt(e.target.value)}
+            className='w-full p-2 border rounded'
+          />
+          <p className='text-xs text-gray-500'>
+            Leave empty to publish immediately.
+          </p>
         </div>
         <button
           type='submit'
