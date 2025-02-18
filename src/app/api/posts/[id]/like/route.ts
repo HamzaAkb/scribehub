@@ -16,8 +16,19 @@ export async function PATCH(
 
     const updatedPost = await prisma.post.update({
         where: { id: Number(id) },
-        data: { likes: { increment: 1 } }
+        data: { likes: { increment: 1 } },
+        include: { author: true },
     })
+
+    if (updatedPost.author.email !== session.user.email) {
+        await prisma.notification.create({
+            data: {
+                userId: updatedPost.author.id,
+                type: "like",
+                message: `Your post "${updatedPost.title}" was liked.`,
+            },
+        })
+    }
 
     return NextResponse.json(updatedPost, { status: 200 })
 }

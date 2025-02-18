@@ -17,17 +17,27 @@ export async function POST(request: Request) {
         return NextResponse.json({ error: "Missing postId or content" }, { status: 400 })
     }
 
-    const comment = await prisma.comment.create({
+    const comment = (await prisma.comment.create({
         data: {
             content,
             post: { connect: { id: Number(postId) } },
             author: { connect: { email: session.user.email } },
         },
-        include: { author: true, post: { include: { author: true } } },
-    })
+        include: {
+            author: true,
+            post: { include: { author: true } },
+        },
+    })) as any
 
-    const postAuthorEmail = comment.post.author.email
-    if (postAuthorEmail && postAuthorEmail !== session.user.email) {
+    if (comment.post.author.email !== session.user.email) {
+        await prisma.notification.create({
+            data: {
+                userId: comment.post.author.id,
+                type: "comment",
+                message: `New comment on your post "${comment.post.title}": ${comment.content.substring(0, 100)}...`,
+            },
+        })
+
         const transporter = nodemailer.createTransport({
             host: process.env.EMAIL_SERVER_HOST,
             port: Number(process.env.EMAIL_SERVER_PORT),
@@ -40,7 +50,7 @@ export async function POST(request: Request) {
 
         const mailOptions = {
             from: process.env.EMAIL_FROM,
-            to: postAuthorEmail,
+            to: comment.post.author.email,
             subject: `New comment on your post "${comment.post.title}"`,
             text: `Hello,\n\nA new comment has been posted on your post "${comment.post.title}":\n\n"${comment.content}"\n\nView the comment in your dashboard.\n\nBest,\nScribe Hub Team`,
         }
