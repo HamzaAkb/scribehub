@@ -20,7 +20,11 @@ export default async function PostPage({ params }: PostPageProps) {
       id: Number(id),
       OR: [{ published: true }, { scheduledAt: { lte: new Date() } } as any],
     },
-    include: { author: true, comments: { include: { author: true } } },
+    include: {
+      author: true,
+      comments: { include: { author: true } },
+      tags: true,
+    },
   })
 
   if (
@@ -29,6 +33,21 @@ export default async function PostPage({ params }: PostPageProps) {
   ) {
     return notFound()
   }
+
+  const relatedPosts = await prisma.post.findMany({
+    where: {
+      published: true,
+      id: { not: post.id },
+      tags: {
+        some: {
+          id: { in: post.tags.map((tag) => tag.id) },
+        },
+      },
+    },
+    take: 3,
+    orderBy: { createdAt: 'desc' },
+    include: { author: true },
+  })
 
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
   const postUrl = `${siteUrl}/posts/${post.id}`
@@ -49,6 +68,28 @@ export default async function PostPage({ params }: PostPageProps) {
         postId={post.id}
         currentUserEmail={session?.user?.email || ''}
       />
+
+      {relatedPosts.length > 0 && (
+        <div className='mt-8'>
+          <h2 className='text-2xl font-bold mb-4'>Related Posts</h2>
+          {relatedPosts.map((related) => (
+            <div key={related.id} className='mb-4 p-4 border rounded'>
+              <h3 className='text-xl font-bold'>
+                <a
+                  href={`/posts/${related.id}`}
+                  className='text-blue-600 hover:underline'
+                >
+                  {related.title}
+                </a>
+              </h3>
+              <p className='text-sm text-gray-500'>
+                By {related.author.name || related.author.email} on{' '}
+                {new Date(related.createdAt).toLocaleDateString()}
+              </p>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   )
 }
