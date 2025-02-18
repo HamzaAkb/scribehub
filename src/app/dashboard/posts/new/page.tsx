@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import PostEditor from '@/components/PostEditor'
 
 export default function NewPostForm() {
   const [title, setTitle] = useState('')
@@ -78,13 +79,7 @@ export default function NewPostForm() {
         </div>
         <div className='mb-4'>
           <label className='block mb-1'>Content</label>
-          <textarea
-            value={content}
-            onChange={(e) => setContent(e.target.value)}
-            className='w-full p-2 border rounded'
-            rows={5}
-            required
-          />
+          <PostEditor initialContent={content} onChange={setContent} />
         </div>
         <div className='mb-4'>
           <label className='block mb-1'>Tags (comma-separated)</label>
