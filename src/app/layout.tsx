@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Providers } from './providers'
 import '@/utils/scheduler'
+import DarkModeToggle from '@/components/DarkModeToggle'
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -27,9 +28,14 @@ export default function RootLayout({
   return (
     <html lang='en'>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100`}
       >
-        <Providers>{children}</Providers>
+        <header className='p-4 flex justify-end'>
+          <DarkModeToggle />
+        </header>
+        <main>
+          <Providers>{children}</Providers>
+        </main>
       </body>
     </html>
   )
