@@ -24,6 +24,7 @@ model User {
   accounts       Account[]
   sessions       Session[]
   bookmarks      Bookmark[]
+  notifications  Notification[]
   createdAt      DateTime  @default(now())
 }
 
@@ -101,4 +102,14 @@ model Bookmark {
   postId  Int
 
   @@unique([userId, postId])
+}
+
+model Notification {
+  id        Int      @id @default(autoincrement())
+  user      User     @relation(fields: [userId], references: [id])
+  userId    Int
+  type      String
+  message   String
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
 }
