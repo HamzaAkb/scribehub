@@ -23,6 +23,7 @@ model User {
   comments       Comment[]
   accounts       Account[]
   sessions       Session[]
+  bookmarks      Bookmark[]
   createdAt      DateTime  @default(now())
 }
 
@@ -44,6 +45,7 @@ model Post {
   authorId    Int
   comments    Comment[]
   tags        Tag[]    @relation("PostTags")
+  bookmarks   Bookmark[]
   createdAt   DateTime @default(now())
 }
 
@@ -89,4 +91,14 @@ model VerificationToken {
   expires    DateTime
 
   @@unique([identifier, token])
+}
+
+model Bookmark {
+  id      Int   @id @default(autoincrement())
+  user    User  @relation(fields: [userId], references: [id])
+  userId  Int
+  post    Post  @relation(fields: [postId], references: [id])
+  postId  Int
+
+  @@unique([userId, postId])
 }

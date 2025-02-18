@@ -4,6 +4,7 @@ import ShareButtons from '@/components/ShareButtons'
 import CommentsSection from '@/components/CommentsSection'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/app/api/auth/[...nextauth]/route'
+import BookmarkButton from '@/components/BookmarkButton'
 
 interface PostPageProps {
   params: { id: string }
@@ -49,6 +50,25 @@ export default async function PostPage({ params }: PostPageProps) {
     include: { author: true },
   })
 
+  let initialBookmarked = false
+  if (session && session.user && session.user.email) {
+    const currentUser = await prisma.user.findUnique({
+      where: { email: session.user.email },
+      select: { id: true },
+    })
+    if (currentUser) {
+      const bookmark = await prisma.bookmark.findUnique({
+        where: {
+          userId_postId: {
+            userId: currentUser.id,
+            postId: post.id,
+          },
+        },
+      })
+      initialBookmarked = !!bookmark
+    }
+  }
+
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
   const postUrl = `${siteUrl}/posts/${post.id}`
 
@@ -63,6 +83,14 @@ export default async function PostPage({ params }: PostPageProps) {
         <p>{post.content}</p>
       </div>
       <ShareButtons url={postUrl} title={post.title} />
+      {session && session.user && (
+        <div className='mt-4'>
+          <BookmarkButton
+            postId={post.id}
+            initialBookmarked={initialBookmarked}
+          />
+        </div>
+      )}
       <CommentsSection
         initialComments={post.comments}
         postId={post.id}
