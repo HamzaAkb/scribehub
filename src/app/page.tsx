@@ -42,21 +42,6 @@ export default async function HomePage({ searchParams }: HomePageProps) {
   return (
     <div className='p-8'>
       <h1 className='text-3xl mb-8'>Public Blog Posts</h1>
-      <form method='GET' className='mb-8'>
-        <input
-          type='text'
-          name='query'
-          placeholder='Search posts...'
-          defaultValue={query}
-          className='p-2 border rounded'
-        />
-        <button
-          type='submit'
-          className='ml-2 px-4 py-2 bg-blue-500 text-white rounded'
-        >
-          Search
-        </button>
-      </form>
       {posts.length === 0 ? (
         <p>No posts available.</p>
       ) : (

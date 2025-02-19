@@ -4,10 +4,11 @@ import './globals.css'
 import { Providers } from './providers'
 import '@/utils/scheduler'
 import DarkModeToggle from '@/components/DarkModeToggle'
+import NotificationsDropdown from '@/components/NotificationsDropdown'
 import { authOptions } from './api/auth/[...nextauth]/route'
 import { getServerSession } from 'next-auth'
 import Link from 'next/link'
-import NotificationsDropdown from '@/components/NotificationsDropdown'
+import SearchBar from '@/components/Searchbar'
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -37,11 +38,16 @@ export default async function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100`}
       >
         <header className='bg-blue-500 dark:bg-blue-700 text-white'>
-          <div className='container mx-auto flex justify-between items-center p-4'>
-            <Link href='/' className='text-xl font-bold'>
-              Scribe Hub
-            </Link>
-            <div className='flex items-center space-x-4'>
+          <div className='container mx-auto flex items-center p-4'>
+            <div className='flex-1'>
+              <Link href='/' className='text-xl font-bold'>
+                Scribe Hub
+              </Link>
+            </div>
+            <div className='flex-1 flex justify-center'>
+              <SearchBar />
+            </div>
+            <div className='flex-1 flex justify-end items-center space-x-4'>
               <DarkModeToggle />
               {session && <NotificationsDropdown />}
             </div>
