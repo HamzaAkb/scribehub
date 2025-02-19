@@ -32,11 +32,9 @@ export default function CommentsSection({
 
   const handleDelete = async (commentId: number) => {
     if (!confirm('Are you sure you want to delete this comment?')) return
-
     const res = await fetch(`/api/comments/${commentId}`, {
       method: 'DELETE',
     })
-
     if (res.ok) {
       refreshComments()
     } else {
@@ -45,29 +43,42 @@ export default function CommentsSection({
   }
 
   return (
-    <div>
-      <h2 className='text-xl mb-4'>Comments</h2>
+    <div className='space-y-6'>
+      <h2 className='text-2xl font-semibold'>Comments</h2>
       {comments.length === 0 ? (
-        <p>No comments yet.</p>
+        <p className='text-gray-600'>
+          No comments yet. Be the first to comment!
+        </p>
       ) : (
-        comments.map((comment: Comment) => (
-          <div key={comment.id} className='mb-4 p-4 border rounded'>
-            <p>{comment.content}</p>
-            <p className='text-sm text-gray-500'>
-              — {comment.author.name || comment.author.email}
-            </p>
-            {comment.author.email === currentUserEmail && (
-              <button
-                onClick={() => handleDelete(comment.id)}
-                className='mt-2 px-3 py-1 bg-red-500 text-white rounded'
-              >
-                Delete Comment
-              </button>
-            )}
-          </div>
-        ))
+        <div className='space-y-4'>
+          {comments.map((comment) => (
+            <div
+              key={comment.id}
+              className='p-4 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded shadow-sm'
+            >
+              <p className='text-gray-800 dark:text-gray-100'>
+                {comment.content}
+              </p>
+              <div className='flex justify-between items-center mt-2'>
+                <p className='text-xs text-gray-500'>
+                  — {comment.author.name || comment.author.email}
+                </p>
+                {comment.author.email === currentUserEmail && (
+                  <button
+                    onClick={() => handleDelete(comment.id)}
+                    className='text-sm text-red-500 hover:underline'
+                  >
+                    Delete
+                  </button>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
       )}
-      <CommentForm postId={postId} onCommentAdded={refreshComments} />
+      <div className='pt-4 border-t border-gray-300 dark:border-gray-600'>
+        <CommentForm postId={postId} onCommentAdded={refreshComments} />
+      </div>
     </div>
   )
 }

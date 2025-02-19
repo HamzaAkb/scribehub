@@ -5,6 +5,7 @@ import CommentsSection from '@/components/CommentsSection'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/app/api/auth/[...nextauth]/route'
 import BookmarkButton from '@/components/BookmarkButton'
+import RelatedPosts from '@/components/RelatedPost'
 
 interface PostPageProps {
   params: { id: string }
@@ -13,7 +14,6 @@ interface PostPageProps {
 export default async function PostPage({ params }: PostPageProps) {
   const resolvedParams = await Promise.resolve(params)
   const { id } = resolvedParams
-
   const session = await getServerSession(authOptions)
 
   const post = await prisma.post.findUnique({
@@ -73,51 +73,34 @@ export default async function PostPage({ params }: PostPageProps) {
   const postUrl = `${siteUrl}/posts/${post.id}`
 
   return (
-    <div className='p-8'>
-      <h1 className='text-3xl font-bold mb-2'>{post.title}</h1>
-      <p className='text-sm text-gray-500 mb-4'>
-        By {post.author.name || post.author.email} on{' '}
-        {new Date(post.createdAt).toLocaleDateString()}
-      </p>
-      <div className='mt-4'>
-        <p>{post.content}</p>
-      </div>
-      <ShareButtons url={postUrl} title={post.title} />
-      {session && session.user && (
-        <div className='mt-4'>
+    <div className='max-w-4xl mx-auto p-8'>
+      <h1 className='text-4xl font-extrabold mb-4'>{post.title}</h1>
+      <div className='flex items-center space-x-4 mb-6'>
+        <p className='text-sm text-gray-500'>
+          By {post.author.name || post.author.email}
+        </p>
+        <p className='text-sm text-gray-500'>
+          {new Date(post.createdAt).toLocaleDateString()}
+        </p>
+        {session && session.user && (
           <BookmarkButton
             postId={post.id}
             initialBookmarked={initialBookmarked}
           />
-        </div>
-      )}
-      <CommentsSection
-        initialComments={post.comments}
-        postId={post.id}
-        currentUserEmail={session?.user?.email || ''}
-      />
-
-      {relatedPosts.length > 0 && (
-        <div className='mt-8'>
-          <h2 className='text-2xl font-bold mb-4'>Related Posts</h2>
-          {relatedPosts.map((related) => (
-            <div key={related.id} className='mb-4 p-4 border rounded'>
-              <h3 className='text-xl font-bold'>
-                <a
-                  href={`/posts/${related.id}`}
-                  className='text-blue-600 hover:underline'
-                >
-                  {related.title}
-                </a>
-              </h3>
-              <p className='text-sm text-gray-500'>
-                By {related.author.name || related.author.email} on{' '}
-                {new Date(related.createdAt).toLocaleDateString()}
-              </p>
-            </div>
-          ))}
-        </div>
-      )}
+        )}
+      </div>
+      <div className='prose dark:prose-dark max-w-full mb-8'>
+        <p>{post.content}</p>
+      </div>
+      <ShareButtons url={postUrl} title={post.title} />
+      <div className='mt-12'>
+        <CommentsSection
+          initialComments={post.comments}
+          postId={post.id}
+          currentUserEmail={session?.user?.email || ''}
+        />
+      </div>
+      {relatedPosts.length > 0 && <RelatedPosts relatedPosts={relatedPosts} />}
     </div>
   )
 }

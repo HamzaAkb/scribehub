@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { Bookmark } from 'lucide-react'
 
 interface BookmarkButtonProps {
   postId: number
@@ -48,9 +49,12 @@ export default function BookmarkButton({
     <button
       onClick={handleToggleBookmark}
       disabled={loading}
-      className='px-4 py-2 bg-gray-200 rounded'
+      className='flex items-center space-x-2 px-3 py-2 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-200 rounded transition-colors'
     >
-      {loading ? '...' : bookmarked ? 'Remove Bookmark' : 'Bookmark'}
+      <Bookmark
+        className={`w-5 h-5 ${bookmarked ? 'text-blue-500' : 'text-gray-500'}`}
+      />
+      <span>{loading ? '...' : bookmarked ? 'Bookmarked' : 'Bookmark'}</span>
     </button>
   )
 }
