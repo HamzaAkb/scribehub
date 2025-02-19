@@ -6,6 +6,7 @@ import PostEditor from '@/components/PostEditor'
 
 export default function NewPostForm() {
   const [title, setTitle] = useState('')
+  const [description, setDescription] = useState('')
   const [content, setContent] = useState('')
   const [tags, setTags] = useState('')
   const [imageFile, setImageFile] = useState<File | null>(null)
@@ -34,10 +35,7 @@ export default function NewPostForm() {
 
       const res = await fetch(
         `https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/upload`,
-        {
-          method: 'POST',
-          body: formData,
-        }
+        { method: 'POST', body: formData }
       )
 
       if (res.ok) {
@@ -51,7 +49,14 @@ export default function NewPostForm() {
     const res = await fetch('/api/posts', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ title, content, tags, imageUrl, scheduledAt }),
+      body: JSON.stringify({
+        title,
+        description,
+        content,
+        tags,
+        imageUrl,
+        scheduledAt,
+      }),
     })
 
     if (res.ok) {
@@ -74,6 +79,17 @@ export default function NewPostForm() {
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             className='w-full p-2 border rounded'
+            required
+          />
+        </div>
+        <div className='mb-4'>
+          <label className='block mb-1'>Description</label>
+          <input
+            type='text'
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            className='w-full p-2 border rounded'
+            placeholder='A short summary of your post'
             required
           />
         </div>

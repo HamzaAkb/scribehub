@@ -60,7 +60,7 @@ export default async function HomePage({ searchParams }: HomePageProps) {
                 {new Date(post.createdAt).toLocaleDateString()}
               </p>
               <p className='mt-2 text-gray-700 dark:text-gray-300'>
-                {post.content.substring(0, 100)}...
+                {post.description}
               </p>
               {post.tags && post.tags.length > 0 && (
                 <div className='mt-2'>

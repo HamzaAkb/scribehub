@@ -89,6 +89,11 @@ export default async function PostPage({ params }: PostPageProps) {
           />
         )}
       </div>
+      <div className='mt-4'>
+        <p className='text-lg font-medium text-gray-700 dark:text-gray-300'>
+          {post.description}
+        </p>
+      </div>
       <div className='prose dark:prose-dark max-w-full mb-8'>
         <p>{post.content}</p>
       </div>

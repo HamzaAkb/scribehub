@@ -37,6 +37,7 @@ model Tag {
 model Post {
   id          Int      @id @default(autoincrement())
   title       String
+  description String?
   content     String
   published   Boolean  @default(false)
   scheduledAt DateTime?  // New field for scheduling publication
