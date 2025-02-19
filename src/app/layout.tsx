@@ -1,12 +1,13 @@
-import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
-import "./globals.css";
+import type { Metadata } from 'next'
+import { Geist, Geist_Mono } from 'next/font/google'
+import './globals.css'
 import { Providers } from './providers'
 import '@/utils/scheduler'
 import DarkModeToggle from '@/components/DarkModeToggle'
-import NotificationsPanel from '@/components/NotificationsPanel'
 import { authOptions } from './api/auth/[...nextauth]/route'
 import { getServerSession } from 'next-auth'
+import Link from 'next/link'
+import NotificationsDropdown from '@/components/NotificationsDropdown'
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -35,15 +36,27 @@ export default async function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100`}
       >
-        <header className='p-4 flex justify-between items-center'>
-          <div className='flex space-x-4'>
-            <DarkModeToggle />
+        <header className='bg-blue-500 dark:bg-blue-700 text-white'>
+          <div className='container mx-auto flex justify-between items-center p-4'>
+            <Link href='/' className='text-xl font-bold'>
+              Scribe Hub
+            </Link>
+            <div className='flex items-center space-x-4'>
+              <DarkModeToggle />
+              {session && <NotificationsDropdown />}
+            </div>
           </div>
-          {session && <NotificationsPanel />}
         </header>
-        <main>
+        <main className='container mx-auto p-4'>
           <Providers>{children}</Providers>
         </main>
+        <footer className='bg-gray-200 dark:bg-gray-800 text-center p-4 mt-8'>
+          <div className='container mx-auto'>
+            <p>
+              &copy; {new Date().getFullYear()} Scribe Hub. All rights reserved.
+            </p>
+          </div>
+        </footer>
       </body>
     </html>
   )
