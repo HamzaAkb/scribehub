@@ -9,6 +9,7 @@ import { authOptions } from './api/auth/[...nextauth]/route'
 import { getServerSession } from 'next-auth'
 import Link from 'next/link'
 import SearchBar from '@/components/Searchbar'
+import { LogIn, LogOut, LucideLayoutDashboard } from 'lucide-react'
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -49,7 +50,30 @@ export default async function RootLayout({
             </div>
             <div className='flex-1 flex justify-end items-center space-x-4'>
               <DarkModeToggle />
-              {session && <NotificationsDropdown />}
+              {session ? (
+                <>
+                  <NotificationsDropdown />
+                  <Link
+                    href='/dashboard'
+                    className='p-2 hover:bg-blue-600 rounded-full transition-colors'
+                  >
+                    <LucideLayoutDashboard size={24} />
+                  </Link>
+                  <Link
+                    href='/api/auth/signout'
+                    className='p-2 hover:bg-blue-600 rounded-full transition-colors'
+                  >
+                    <LogOut size={24} />
+                  </Link>
+                </>
+              ) : (
+                <Link
+                  href='/api/auth/signin'
+                  className='p-2 hover:bg-blue-600 rounded-full transition-colors'
+                >
+                  <LogIn size={24} />
+                </Link>
+              )}
             </div>
           </div>
         </header>
