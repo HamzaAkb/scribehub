@@ -2,8 +2,13 @@ import prisma from '@/lib/prisma'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/app/api/auth/[...nextauth]/route'
 import { redirect } from 'next/navigation'
+import Link from 'next/link'
 
-export default async function Dashboard() {
+interface DashboardProps {
+  searchParams: { postPage?: string }
+}
+
+export default async function Dashboard({ searchParams }: DashboardProps) {
   const session = await getServerSession(authOptions)
   if (!session || !session.user || !session.user.email) {
     redirect('/signin')
@@ -36,10 +41,27 @@ export default async function Dashboard() {
     where: { post: { authorId: currentUser.id } },
   })
 
+  const postPage = parseInt(searchParams.postPage || '1', 10)
+  const postsPerPage = 5
+  const skip = (postPage - 1) * postsPerPage
+
+  const userPosts = await prisma.post.findMany({
+    where: { authorId: currentUser.id },
+    orderBy: { createdAt: 'desc' },
+    skip,
+    take: postsPerPage,
+  })
+
+  const totalUserPosts = await prisma.post.count({
+    where: { authorId: currentUser.id },
+  })
+  const totalPages = Math.ceil(totalUserPosts / postsPerPage)
+
   return (
     <div className='max-w-4xl mx-auto p-8'>
+      {/* Analytics Section */}
       <h1 className='text-3xl font-bold mb-8'>Dashboard Analytics</h1>
-      <div className='grid grid-cols-1 sm:grid-cols-2 gap-6'>
+      <div className='grid grid-cols-1 sm:grid-cols-2 gap-6 mb-8'>
         <div className='bg-white dark:bg-gray-800 p-6 rounded-lg shadow'>
           <h2 className='text-xl font-semibold mb-2'>Total Posts</h2>
           <p className='text-3xl'>{postsCount}</p>
@@ -51,6 +73,49 @@ export default async function Dashboard() {
         <div className='bg-white dark:bg-gray-800 p-6 rounded-lg shadow'>
           <h2 className='text-xl font-semibold mb-2'>Total Comments</h2>
           <p className='text-3xl'>{commentsCount}</p>
+        </div>
+      </div>
+
+      <div className='mt-12'>
+        <h2 className='text-2xl font-bold mb-4'>Your Latest Posts</h2>
+        {userPosts.length === 0 ? (
+          <p>You haven't written any posts yet.</p>
+        ) : (
+          <div className='space-y-4'>
+            {userPosts.map((post) => (
+              <div
+                key={post.id}
+                className='p-4 border rounded hover:shadow-md transition-shadow'
+              >
+                <Link href={`/posts/${post.id}`}>
+                  <h3 className='text-xl font-semibold text-blue-600 hover:underline'>
+                    {post.title}
+                  </h3>
+                </Link>
+                <p className='text-sm text-gray-500'>
+                  {new Date(post.createdAt).toLocaleDateString()}
+                </p>
+              </div>
+            ))}
+          </div>
+        )}
+        <div className='mt-4 flex justify-center space-x-4'>
+          {postPage > 1 && (
+            <Link
+              href={`/dashboard?postPage=${postPage - 1}`}
+              className='px-4 py-2 bg-gray-300 rounded hover:bg-gray-400'
+            >
+              &larr; Previous
+            </Link>
+          )}
+          {postPage < totalPages && (
+            <Link
+              href={`/dashboard?postPage=${postPage + 1}`}
+              className='px-4 py-2 bg-gray-300 rounded hover:bg-gray-400'
+            >
+              Next &rarr;
+            </Link>
+          )}
         </div>
       </div>
     </div>
