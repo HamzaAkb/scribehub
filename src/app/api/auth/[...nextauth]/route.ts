@@ -8,9 +8,12 @@ export const authOptions = {
     providers: [
         EmailProvider({
             server: process.env.EMAIL_SERVER,
-            from: process.env.EMAIL_FROM
-        })
-    ]
+            from: process.env.EMAIL_FROM,
+        }),
+    ],
+    pages: {
+        signIn: '/signin',
+    },
 }
 
 const handler = NextAuth(authOptions)
