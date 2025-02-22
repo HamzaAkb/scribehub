@@ -3,6 +3,7 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/app/api/auth/[...nextauth]/route'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
+import PostCard from '@/components/PostCard'
 
 interface DashboardProps {
   searchParams: { postPage?: string }
@@ -29,12 +30,8 @@ export default async function Dashboard({ searchParams }: DashboardProps) {
 
   const metrics = await prisma.post.aggregate({
     where: { authorId: currentUser.id },
-    _sum: {
-      likes: true,
-    },
-    _avg: {
-      likes: true,
-    },
+    _sum: { likes: true },
+    _avg: { likes: true },
   })
 
   const commentsCount = await prisma.comment.count({
@@ -47,6 +44,7 @@ export default async function Dashboard({ searchParams }: DashboardProps) {
 
   const userPosts = await prisma.post.findMany({
     where: { authorId: currentUser.id },
+    include: { author: true, tags: true },
     orderBy: { createdAt: 'desc' },
     skip,
     take: postsPerPage,
@@ -59,7 +57,6 @@ export default async function Dashboard({ searchParams }: DashboardProps) {
 
   return (
     <div className='max-w-4xl mx-auto p-8'>
-      {/* Analytics Section */}
       <h1 className='text-3xl font-bold mb-8'>Dashboard Analytics</h1>
       <div className='grid grid-cols-1 sm:grid-cols-2 gap-6 mb-8'>
         <div className='bg-white dark:bg-gray-800 p-6 rounded-lg shadow'>
@@ -81,21 +78,9 @@ export default async function Dashboard({ searchParams }: DashboardProps) {
         {userPosts.length === 0 ? (
           <p>You haven't written any posts yet.</p>
         ) : (
-          <div className='space-y-4'>
+          <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
             {userPosts.map((post) => (
-              <div
-                key={post.id}
-                className='p-4 border rounded hover:shadow-md transition-shadow'
-              >
-                <Link href={`/posts/${post.id}`}>
-                  <h3 className='text-xl font-semibold text-blue-600 hover:underline'>
-                    {post.title}
-                  </h3>
-                </Link>
-                <p className='text-sm text-gray-500'>
-                  {new Date(post.createdAt).toLocaleDateString()}
-                </p>
-              </div>
+              <PostCard key={post.id} post={post} />
             ))}
           </div>
         )}

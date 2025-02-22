@@ -1,5 +1,6 @@
 import prisma from '@/lib/prisma'
 import Link from 'next/link'
+import PostCard from '@/components/PostCard'
 
 interface HomePageProps {
   searchParams: { query?: string; page?: string }
@@ -46,35 +47,7 @@ export default async function HomePage({ searchParams }: HomePageProps) {
       ) : (
         <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
           {posts.map((post) => (
-            <div
-              key={post.id}
-              className='border rounded-lg shadow-sm hover:shadow-lg transition-shadow bg-white dark:bg-gray-800 p-4'
-            >
-              <Link href={`/posts/${post.id}`}>
-                <h2 className='text-xl font-bold text-blue-600 dark:text-blue-400 hover:underline'>
-                  {post.title}
-                </h2>
-              </Link>
-              <p className='text-sm text-gray-500'>
-                By {post.author.name || post.author.email} on{' '}
-                {new Date(post.createdAt).toLocaleDateString()}
-              </p>
-              <p className='mt-2 text-gray-700 dark:text-gray-300'>
-                {post.description}
-              </p>
-              {post.tags && post.tags.length > 0 && (
-                <div className='mt-2'>
-                  {post.tags.map((tag: any) => (
-                    <span
-                      key={tag.id}
-                      className='inline-block bg-gray-200 dark:bg-gray-600 px-2 py-1 text-sm rounded mr-2'
-                    >
-                      {tag.name}
-                    </span>
-                  ))}
-                </div>
-              )}
-            </div>
+            <PostCard key={post.id} post={post} />
           ))}
         </div>
       )}

@@ -2,44 +2,62 @@ import prisma from '@/lib/prisma'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/app/api/auth/[...nextauth]/route'
 import { redirect } from 'next/navigation'
+import PostCard from '@/components/PostCard'
 
-export default async function PostsPage() {
-  // Get the server session
+interface DashboardProps {
+  searchParams: { postPage?: string }
+}
+
+export default async function PostsPage({ searchParams }: DashboardProps) {
   const session = await getServerSession(authOptions)
 
-  // Redirect if the session or user/email is missing
   if (!session || !session.user || !session.user.email) {
     redirect('/signin')
   }
 
-  // Now TypeScript knows session.user.email is defined
+  const resolvedSearchParams = await Promise.resolve(searchParams)
+  const postPage = parseInt(resolvedSearchParams.postPage || '1', 10)
+  const postsPerPage = 5
+  const skip = (postPage - 1) * postsPerPage
+
   const posts = await prisma.post.findMany({
     where: {
-      author: {
-        email: session.user.email,
-      },
+      author: { email: session.user.email },
     },
-    orderBy: {
-      createdAt: 'desc',
-    },
+    include: { author: true, tags: true },
+    orderBy: { createdAt: 'desc' },
+    skip,
+    take: postsPerPage,
   })
 
   return (
     <div className='p-8'>
-      <h1 className='text-2xl mb-4'>Your Posts</h1>
+      <h1 className='text-2xl font-bold mb-4'>Your Posts</h1>
       {posts.length === 0 ? (
         <p>No posts found. Create your first post!</p>
       ) : (
-        posts.map((post) => (
-          <div key={post.id} className='mb-4 p-4 border rounded'>
-            <h2 className='text-xl font-bold'>{post.title}</h2>
-            <p>{post.content}</p>
-            <p className='text-sm text-gray-500'>
-              {new Date(post.createdAt).toLocaleString()}
-            </p>
-          </div>
-        ))
+        <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
+          {posts.map((post) => (
+            <PostCard key={post.id} post={post} />
+          ))}
+        </div>
       )}
+      <div className='mt-8 flex justify-center space-x-4'>
+        {postPage > 1 && (
+          <a
+            href={`/dashboard/posts?postPage=${postPage - 1}`}
+            className='px-4 py-2 bg-gray-300 rounded hover:bg-gray-400'
+          >
+            &larr; Previous
+          </a>
+        )}
+        <a
+          href={`/dashboard/posts?postPage=${postPage + 1}`}
+          className='px-4 py-2 bg-gray-300 rounded hover:bg-gray-400'
+        >
+          Next &rarr;
+        </a>
+      </div>
     </div>
   )
 }
