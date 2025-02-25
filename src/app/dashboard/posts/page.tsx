@@ -3,6 +3,7 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/app/api/auth/[...nextauth]/route'
 import { redirect } from 'next/navigation'
 import PostCard from '@/components/PostCard'
+import PaginationControls from '@/components/PaginationControls'
 
 interface DashboardProps {
   searchParams: { postPage?: string }
@@ -30,6 +31,11 @@ export default async function PostsPage({ searchParams }: DashboardProps) {
     take: postsPerPage,
   })
 
+  const totalUserPosts = await prisma.post.count({
+    where: { author: { email: session.user.email } },
+  })
+  const totalPages = Math.ceil(totalUserPosts / postsPerPage)
+
   return (
     <div className='p-8'>
       <h1 className='text-2xl font-bold mb-4'>Your Posts</h1>
@@ -42,22 +48,11 @@ export default async function PostsPage({ searchParams }: DashboardProps) {
           ))}
         </div>
       )}
-      <div className='mt-8 flex justify-center space-x-4'>
-        {postPage > 1 && (
-          <a
-            href={`/dashboard/posts?postPage=${postPage - 1}`}
-            className='px-4 py-2 bg-gray-300 rounded hover:bg-gray-400'
-          >
-            &larr; Previous
-          </a>
-        )}
-        <a
-          href={`/dashboard/posts?postPage=${postPage + 1}`}
-          className='px-4 py-2 bg-gray-300 rounded hover:bg-gray-400'
-        >
-          Next &rarr;
-        </a>
-      </div>
+      <PaginationControls
+        currentPage={postPage}
+        totalPages={totalPages}
+        baseUrl='/dashboard/posts'
+      />
     </div>
   )
 }
