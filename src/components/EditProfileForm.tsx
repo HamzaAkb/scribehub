@@ -63,37 +63,52 @@ export default function EditProfileForm({
   }
 
   return (
-    <div className='max-w-md mx-auto p-8'>
-      <h1 className='text-2xl mb-4'>Edit Profile</h1>
-      <form onSubmit={handleSubmit}>
-        <div className='mb-4'>
-          <label className='block mb-1'>Name</label>
-          <input
-            type='text'
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            className='w-full p-2 border rounded'
-            required
-          />
-        </div>
-        <div className='mb-4'>
-          <label className='block mb-1'>Profile Image</label>
-          <input type='file' onChange={handleFileChange} />
-          {previewUrl && (
-            <img
-              src={previewUrl}
-              alt='Profile Preview'
-              className='mt-2 h-24 w-24 object-cover rounded-full'
+    <div className='max-w-2xl mx-auto p-8'>
+      <h1 className='text-3xl font-bold mb-8 text-center'>Edit Profile</h1>
+      <form
+        onSubmit={handleSubmit}
+        className='grid grid-cols-1 md:grid-cols-12 gap-6'
+      >
+        <div className='md:col-span-8 space-y-6'>
+          <div>
+            <label className='block mb-1 text-lg font-medium text-gray-700 dark:text-gray-200'>
+              Name
+            </label>
+            <input
+              type='text'
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              className='w-full p-3 border border-gray-300 dark:border-gray-700 rounded focus:outline-none focus:ring-2 focus:ring-blue-500'
+              required
             />
-          )}
+          </div>
         </div>
-        <button
-          type='submit'
-          disabled={loading}
-          className='px-4 py-2 bg-blue-500 text-white rounded'
-        >
-          {loading ? 'Updating...' : 'Update Profile'}
-        </button>
+        <div className='md:col-span-4 space-y-6'>
+          <div>
+            <label className='block mb-1 text-lg font-medium text-gray-700 dark:text-gray-200'>
+              Profile Image
+            </label>
+            <input type='file' onChange={handleFileChange} className='w-full' />
+            {previewUrl && (
+              <div className='mt-2'>
+                <img
+                  src={previewUrl}
+                  alt='Profile Preview'
+                  className='h-32 w-32 object-cover rounded-full mx-auto'
+                />
+              </div>
+            )}
+          </div>
+        </div>
+        <div className='md:col-span-12'>
+          <button
+            type='submit'
+            disabled={loading}
+            className='w-full py-3 bg-blue-500 hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700 text-white font-semibold rounded-lg transition-colors'
+          >
+            {loading ? 'Updating...' : 'Update Profile'}
+          </button>
+        </div>
       </form>
     </div>
   )
