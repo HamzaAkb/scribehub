@@ -1,6 +1,6 @@
 import prisma from '@/lib/prisma'
-import Link from 'next/link'
 import PostCard from '@/components/PostCard'
+import PaginationControls from '@/components/PaginationControls'
 
 interface HomePageProps {
   searchParams: { query?: string; page?: string }
@@ -40,6 +40,8 @@ export default async function HomePage({ searchParams }: HomePageProps) {
 
   const totalPages = Math.ceil(totalPosts / postsPerPage)
 
+  const baseUrl = `/?query=${encodeURIComponent(query)}`
+
   return (
     <div className='p-8'>
       {posts.length === 0 ? (
@@ -51,28 +53,12 @@ export default async function HomePage({ searchParams }: HomePageProps) {
           ))}
         </div>
       )}
-      <div className='mt-8 flex justify-center space-x-4'>
-        {currentPage > 1 && (
-          <Link
-            href={`/?query=${encodeURIComponent(query)}&page=${
-              currentPage - 1
-            }`}
-            className='px-4 py-2 bg-gray-300 rounded'
-          >
-            Previous
-          </Link>
-        )}
-        {currentPage < totalPages && (
-          <Link
-            href={`/?query=${encodeURIComponent(query)}&page=${
-              currentPage + 1
-            }`}
-            className='px-4 py-2 bg-gray-300 rounded'
-          >
-            Next
-          </Link>
-        )}
-      </div>
+      <PaginationControls
+        currentPage={currentPage}
+        totalPages={totalPages}
+        baseUrl={baseUrl}
+        queryParam='page'
+      />
     </div>
   )
 }
