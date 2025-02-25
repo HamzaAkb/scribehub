@@ -1,7 +1,8 @@
 import prisma from '@/lib/prisma'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/app/api/auth/[...nextauth]/route'
-import { redirect } from 'next/navigation'
+import { redirect, notFound } from 'next/navigation'
+import PostCard from '@/components/PostCard'
 
 export default async function ProfilePage() {
   const session = await getServerSession(authOptions)
@@ -11,11 +12,14 @@ export default async function ProfilePage() {
 
   const user = await prisma.user.findUnique({
     where: { email: session.user.email },
-    include: { posts: true, comments: true },
+    include: {
+      posts: { include: { author: true, tags: true } },
+      comments: true,
+    },
   })
 
   if (!user) {
-    return <div>User not found</div>
+    return notFound()
   }
 
   return (
@@ -35,15 +39,11 @@ export default async function ProfilePage() {
         {user.posts.length === 0 ? (
           <p>You have not created any posts yet.</p>
         ) : (
-          user.posts.map((post) => (
-            <div key={post.id} className='mb-4 p-4 border rounded'>
-              <h3 className='text-xl font-bold'>{post.title}</h3>
-              <p>{post.content}</p>
-              <p className='text-sm text-gray-500'>
-                {new Date(post.createdAt).toLocaleString()}
-              </p>
-            </div>
-          ))
+          <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
+            {user.posts.map((post) => (
+              <PostCard key={post.id} post={post} />
+            ))}
+          </div>
         )}
       </section>
       <section>
