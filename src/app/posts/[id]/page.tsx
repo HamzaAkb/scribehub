@@ -48,7 +48,7 @@ export default async function PostPage({ params }: PostPageProps) {
     },
     take: 3,
     orderBy: { createdAt: 'desc' },
-    include: { author: true },
+    include: { author: true, tags: true },
   })
 
   let initialBookmarked = false

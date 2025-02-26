@@ -32,12 +32,13 @@ export default function PostCard({ post }: PostCardProps) {
       {post.tags && post.tags.length > 0 && (
         <div className='mt-2'>
           {post.tags.map((tag) => (
-            <span
+            <Link
+              href={`/tags/${tag.name}`}
               key={tag.id}
               className='inline-block bg-gray-200 dark:bg-gray-600 px-2 py-1 text-sm rounded mr-2'
             >
               {tag.name}
-            </span>
+            </Link>
           ))}
         </div>
       )}

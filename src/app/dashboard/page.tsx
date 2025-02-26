@@ -56,9 +56,9 @@ export default async function Dashboard({ searchParams }: DashboardProps) {
   const totalPages = Math.ceil(totalUserPosts / postsPerPage)
 
   return (
-    <div className='max-w-4xl mx-auto p-8'>
+    <div className='mx-auto p-8'>
       <h1 className='text-3xl font-bold mb-8'>Dashboard Analytics</h1>
-      <div className='grid grid-cols-1 sm:grid-cols-2 gap-6 mb-8'>
+      <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 mb-8'>
         <div className='bg-white dark:bg-gray-800 p-6 rounded-lg shadow'>
           <h2 className='text-xl font-semibold mb-2'>Total Posts</h2>
           <p className='text-3xl'>{postsCount}</p>
@@ -78,7 +78,7 @@ export default async function Dashboard({ searchParams }: DashboardProps) {
         {userPosts.length === 0 ? (
           <p>You haven't written any posts yet.</p>
         ) : (
-          <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
+          <div className='grid grid-cols-1 md:grid-cols-3 gap-6'>
             {userPosts.map((post) => (
               <PostCard key={post.id} post={post} />
             ))}
