@@ -1,3 +1,4 @@
+import ClientLink from '@/components/ClientLink'
 import Link from 'next/link'
 
 interface PostCardProps {
@@ -14,11 +15,12 @@ interface PostCardProps {
 export default function PostCard({ post }: PostCardProps) {
   return (
     <div className='border rounded-lg shadow-sm hover:shadow-lg transition-shadow bg-white dark:bg-gray-800 p-4'>
-      <Link href={`/posts/${post.id}`}>
-        <h2 className='text-xl font-bold text-blue-600 dark:text-blue-400 hover:underline'>
-          {post.title}
-        </h2>
-      </Link>
+      <ClientLink
+        href={`/posts/${post.id}`}
+        className='text-xl font-bold text-blue-600 dark:text-blue-400 hover:underline'
+      >
+        {post.title}
+      </ClientLink>
       <p className='text-sm text-gray-500'>
         By{' '}
         <Link href={`/profile/${post.author.id}`} className='hover:underline'>
@@ -32,13 +34,12 @@ export default function PostCard({ post }: PostCardProps) {
       {post.tags && post.tags.length > 0 && (
         <div className='mt-2'>
           {post.tags.map((tag) => (
-            <Link
-              href={`/tags/${tag.name}`}
+            <span
               key={tag.id}
               className='inline-block bg-gray-200 dark:bg-gray-600 px-2 py-1 text-sm rounded mr-2'
             >
               {tag.name}
-            </Link>
+            </span>
           ))}
         </div>
       )}
